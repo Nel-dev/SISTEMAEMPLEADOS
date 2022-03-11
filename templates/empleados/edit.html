@@ -1,0 +1,50 @@
+{% include 'header.html' %}
+
+{% with messages= get_flashed_messages() %}
+
+{% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+{% for empleado in empleados %}
+<form method="post" action="/update" enctype="multipart/form-data">
+
+    <div class="card">
+        <div class="card-header">
+            Editar empleado
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del empleado</h4>
+            <p class="card-text">
+                <div class="form-group">
+                  <label for="txtNombre">Nombre:</label>
+                  <input type="text" value="{{empleado[1]}}" name="txtNombre" id="txtNombre" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="txtCorreo">Correo:</label>
+                    <input type="text" value="{{empleado[2]}}" name="txtCorreo" id="txtCorreo" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="txtFoto">Foto:</label>
+                    <br>
+                    <img class="rounded float-left" width="100" src="{{url_for('uploads',nombreFoto=empleado[3])}}" alt="">
+                    <br>
+                    <input type="file" value="{{empleado[3]}}" name="txtFoto" id="txtFoto" class="form-control">
+                </div>
+                <input type="hidden" value="{{empleado[0]}}" name="txtID" id="txtID">
+
+                <div class="form-group">
+                    <input class="btn btn-success" type="submit" value="Modificar">
+                    <a class="btn btn-primary" href="{{url_for('index')}}">Regresar</a>
+                </div>
+            </p>
+        </div>
+    </div>
+</form>
+{% endfor %}
+{% include 'footer.html' %}
