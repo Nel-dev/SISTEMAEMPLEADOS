@@ -1,11 +1,14 @@
 from flask import Flask
+from dotenv import load_dotenv
 from flask import render_template, request, redirect, flash, url_for
 from flask import send_from_directory
 from flaskext.mysql import MySQL
 from datetime import datetime
 import os
 import yaml
-from azure.storage.blob import ContainerClient
+from azure.storage.blob import ContainerClient, BlobServiceClient
+
+load_dotenv()
 
 app= Flask(__name__)
 app.secret_key="DevOps"
@@ -15,6 +18,7 @@ app.config['MYSQL_DATABASE_HOST']=os.getenv('DB_HOST',"localhost")
 app.config['MYSQL_DATABASE_USER']=os.getenv('DB_USER',"root")
 app.config['MYSQL_DATABASE_PASSWORD']=os.getenv('DB_PASSWORD',"")
 app.config['MYSQL_DATABASE_DB']=os.getenv('DB_NAME',"sistema")
+print(app.config)
 mysql.init_app(app)
 
 CARPETA= os.path.join('uploads')
@@ -133,17 +137,17 @@ def storage():
             blob_client = container_client.get_blob_client(_foto.filename)
             blob_client.upload_blob(_foto.stream.read(), overwrite=True)
             print(f'{_foto.name} uploaded to blob storage')
+            
 
         sql="INSERT INTO `empleados` (`id`, `nombre`, `correo`, `foto`) VALUES (NULL, %s, %s, %s);"
         datos=(_nombre , _correo , nuevoNombreFoto)
         
-        
-
         conn=mysql.connect()
         cursor=conn.cursor()
         cursor.execute(sql, datos)
         conn.commit()
     return redirect(url_for('index'))
+
 
 if __name__=='__main__':
     app.run(debug=True)
