@@ -4,6 +4,8 @@ from flask import send_from_directory
 from flaskext.mysql import MySQL
 from datetime import datetime
 import os
+import yaml
+from azure.storage.blob import ContainerClient
 
 app= Flask(__name__)
 app.secret_key="DevOps"
@@ -17,6 +19,16 @@ mysql.init_app(app)
 
 CARPETA= os.path.join('uploads')
 app.config['CARPETA']=CARPETA
+
+
+def load_config():
+	dir_root = os.path.dirname(os.path.abspath(__file__))
+
+	with open(dir_root + "/config.yaml", "r") as yamlfile:
+		return yaml.load(yamlfile, Loader=yaml.FullLoader)
+config = load_config()
+
+
 
 @app.route('/uploads/<nombreFoto>')
 def uploads(nombreFoto):
@@ -41,6 +53,12 @@ def destroy(id):
     cursor=conn.cursor()
     cursor.execute("SELECT foto FROM empleados WHERE id=%s",id)
     fila=cursor.fetchall()
+    _azure_storage = config["azure_storage_connectionstring"]
+    _azure_container = config["file_container_name"]
+    container_client = ContainerClient.from_connection_string(_azure_storage, _azure_container)
+
+    container_client.get_blob_client(fila).DeleteIfExists()
+    
     os.remove(os.path.join(app.config['CARPETA'],fila[0][0]))
     cursor.execute("DELETE FROM empleados WHERE id=%s",(id))
     conn.commit()
@@ -87,9 +105,6 @@ def update():
     else:
         cursor.execute(sql, datos)
         conn.commit()
-
-    
-    
     return redirect('/')
 
 @app.route('/create')
@@ -99,9 +114,12 @@ def create():
 
 @app.route('/store', methods=['POST'])
 def storage():
+    _azure_storage = config["azure_storage_connectionstring"]
+    _azure_container = config["file_container_name"]
     _nombre=request.form['txtNombre']
     _correo=request.form['txtCorreo']
     _foto=request.files['txtFoto']
+    container_client = ContainerClient.from_connection_string(_azure_storage, _azure_container)
 
     if _nombre=='' or _correo=='' or _foto.filename=='':
         flash("Recuerda llenar los datos de los campos")
@@ -112,10 +130,14 @@ def storage():
 
         if _foto.filename!='':
             nuevoNombreFoto=tiempo+_foto.filename
-            _foto.save("uploads/"+nuevoNombreFoto)
+            blob_client = container_client.get_blob_client(_foto.filename)
+            blob_client.upload_blob(_foto.stream.read(), overwrite=True)
+            print(f'{_foto.name} uploaded to blob storage')
 
         sql="INSERT INTO `empleados` (`id`, `nombre`, `correo`, `foto`) VALUES (NULL, %s, %s, %s);"
         datos=(_nombre , _correo , nuevoNombreFoto)
+        
+        
 
         conn=mysql.connect()
         cursor=conn.cursor()
@@ -125,6 +147,5 @@ def storage():
 
 if __name__=='__main__':
     app.run(debug=True)
-
 
 
