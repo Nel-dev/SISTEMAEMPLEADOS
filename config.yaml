@@ -1,3 +1,3 @@
-azure_storage_connectionstring: "DefaultEndpointsProtocol=https;AccountName=tryblobpythonfornow;AccountKey=ymjstVm2ggZe6cojZ/vKTrspF5yfdR6ZJMmxOmHakyWRsxwBx/5vrEKxKJIIE4lG4iGjYkrTxGTx+AStRszypA==;EndpointSuffix=core.windows.net"
-file_container_name: "mycontainer"
+azure_storage_connectionstring: "DefaultEndpointsProtocol=https;AccountName=sistecredito;AccountKey=UbjQPHZe9mMHLsHGNiwNWDgmFoXbJt/96V2vnrr/5C6l1UBRrXrJkJwdpQhAvCXPBOyS3K07fC8hE+XX0VVuIw==;EndpointSuffix=core.windows.net"
+file_container_name: "sistecredito"
 source_folder: "C:/Users/NEL/Desktop/Reto/SISTEMAEMPLEADO/uploads/"
