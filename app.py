@@ -38,6 +38,7 @@ config = load_config()
 def uploads(nombreFoto):
     return send_from_directory(app.config['CARPETA'], nombreFoto)
 
+
 @app.route('/')
 def index():
     sql="SELECT * FROM `empleados`;"
