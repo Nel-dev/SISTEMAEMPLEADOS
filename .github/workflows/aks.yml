@@ -20,9 +20,19 @@ jobs:
         login-server: ${{ secrets.REGISTRY_URL }}
         username: ${{ secrets.REGISTRY_USERNAME }} 
         password: ${{ secrets.REGISTRY_PASSWORD }}
-    
+
+    - name: Azure Blob Storage - Download Config
+      uses: armanrahman22/azblob-download-action
+      with:
+        storage-account-name: "sistecredito"
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        container-name: "sistecredito"
+        blob-name: ".env"
+        download-path: "."
+  
     # Container build and push to a Azure Container Registry (ACR)
-    - run: |
-        docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
-        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
-      working-directory: ./
+    - name: Build Image
+      run: docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+
+    - name: Push Image in Registry
+      run: docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
