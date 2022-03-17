@@ -36,3 +36,18 @@ jobs:
 
     - name: Push Image in Registry
       run: docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: 'Deploy to Azure Container Instances'
+      uses: 'azure/aci-deploy@v1'
+      with:
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+        dns-name-label: ${{ env.CLUSTER_RESOURCE_GROUP }}${{ github.run_number }}
+        image: ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+        registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        registry-password: ${{ secrets.REGISTRY_PASSWORD }}
