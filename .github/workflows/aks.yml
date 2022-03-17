@@ -1,11 +1,12 @@
 name: Azure K8 Deploy
-
+on: 
+  workflow_dispatch:
 env:
-  REGISTRY_NAME: {registry-name}
-  CLUSTER_NAME: {cluster-name}
-  CLUSTER_RESOURCE_GROUP: {resource-group-name}
-  NAMESPACE: {namespace-name}
-  APP_NAME: {app-name}
+  REGISTRY_NAME: sistecreditoContainer
+  CLUSTER_NAME: sistecredito
+  CLUSTER_RESOURCE_GROUP: sistecreditoResourceGroup
+  NAMESPACE: app
+  APP_NAME: app.py
   
 jobs:
   build:
